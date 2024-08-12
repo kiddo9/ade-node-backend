@@ -71,16 +71,11 @@ app.post('/productDetails', Upload.single('productImage'), async (req, res) => {
         .from('imageList')
         .getPublicUrl(filepath)
         
-      await Products.create({
-        productImage: data.publicUrl,
-        productname,
-        productPrice,
-        productStatus,
-        productDescription,
-        productUrl,
-      });
+        const Sqlquery = 'INSERT INTO products_abe (productImage, productname, productPrice, productStatus, productDescription, productUrl) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *'
+        const valueInsertion = [data.publicUrl, productname, productPrice, productStatus, productDescription, productUrl]
+        const InsertData = await client.query(Sqlquery, valueInsertion);
   
-      res.json({ success: true, message: 'Product was inserted successfully' });
+      res.json({ success: true, message: 'Product was inserted successfully', InsertData });
     } catch (error) {
       console.error('Error uploading product:', error);
       res.status(500).json({ error: 'Failed to upload product' });
@@ -107,15 +102,12 @@ app.post('/productDetails', Upload.single('productImage'), async (req, res) => {
         .storage
         .from('imageList')
         .getPublicUrl(filepath)
-        
-      await Works.create({
-        workimage: data.publicUrl,
-        workname,
-        workstatus,
-        workdetails,
-      });
+
+        const Sqlquery = 'INSERT INTO work ( workimage, workname, workstatus, workdetails) VALUES ($1, $2, $3, $4) RETURNING *'
+        const valueInsertion = [data.publicUrl, workname, workstatus, workdetails]
+        const InsertData = await client.query(Sqlquery, valueInsertion);
   
-      res.json({ success: true, message: 'work was inserted successfully' });
+      res.json({ success: true, message: 'work was inserted successfully', InsertData });
     } catch (error) {
       console.error('Error uploading product:', error);
       res.status(500).json({ error: 'Failed to upload work' });
