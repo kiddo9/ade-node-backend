@@ -28,14 +28,9 @@ app.get('/', (req, res) => {
 app.get('/AllProducts', async(req, res) => {
   try {
      const ProductList = await client.query('SELECT * FROM products_abe');
-
-    if(ProductList){
-        console.log('here', ProductList);
-        res.json({fetched:true, message: 'here are the data', Product: ProductList})
-    }else{
-        console.log('wahala done dey ooo');
-        res.json({fetched: false, message: 'no data data'})
-    }
+     const products = ProductList.rows
+     console.log(products);
+     res.json({fetched: true, message:'products fetched', products})
   } catch (error) {
     console.error(error);
     
@@ -46,9 +41,9 @@ app.get('/AllProducts', async(req, res) => {
 app.get('/Allworks', async(req, res) => {
   const workList = await client.query('SELECT * FROM work');
 
-  if(workList){
+  if(workList.rows){
       console.log('here', workList);
-      res.json({fetched:true, message: 'here are the data', Product: workList})
+      res.json({fetched:true, message: 'here are the data', Product: workList.rows})
   }else{
       console.log('wahala done dey ooo');
       res.json({fetched: false, message: 'no data data'})
