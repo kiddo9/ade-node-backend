@@ -29,11 +29,9 @@ app.get('/AllProducts', async(req, res) => {
   try {
      const ProductList = await client.query('SELECT * FROM products_abe');
      const products = ProductList.rows
-     console.log(products);
      res.json({fetched: true, message:'products fetched', products})
   } catch (error) {
     console.error(error);
-    
   }
 
 })
@@ -113,6 +111,95 @@ app.post('/productDetails', Upload.single('productImage'), async (req, res) => {
       res.status(500).json({ error: 'Failed to upload work' });
     }
   });
+
+  app.delete('/DelectItem/:id', async(req, res) => {
+    const { id }= req.params
+    
+    try {
+      const Query = "SELECT productImage FROM products_abe WHERE id = $1"
+      const values = [id];
+      const Sqlquery = await client.query(Query, values);
+
+      if(Sqlquery.rowCount > 0) {
+        const ImageUrl = Sqlquery.rows[0].productimage
+        console.log(ImageUrl);
+
+        const filepath = ImageUrl.split('/storage/v1/object/public/')[1];
+        console.log(filepath);
+        
+
+      const {error: storageError} =  await Supabase
+        .storage
+        .from('imageList')
+        .remove([filepath])
+
+        if(storageError){
+          console.log(storageError);
+        }
+
+        const DeleteQuery = 'DELETE FROM products_abe WHERE id = $1'
+        const values = [id];
+        const Query = await client.query(DeleteQuery, values);
+
+        if(Query.rowCount > 0) {
+          console.log(Query.rowCount,'has gone');
+          res.json({success: true, message:'product has been deleted'})
+        }else{
+          console.log('error occured');
+        }
+        
+      }else{
+        console.log('hmmmm');
+      }
+    } catch (error) {
+      console.error('sth went wrong', error);
+    }
+  })
+
+
+  app.delete('/DelectWork/:id', async(req, res) => {
+    const { id }= req.params
+    
+    try {
+      const Query = "SELECT workimage FROM work WHERE id = $1"
+      const values = [id];
+      const Sqlquery = await client.query(Query, values);
+
+      if(Sqlquery.rowCount > 0) {
+        const ImageUrl = Sqlquery.rows[0].workimage
+        console.log(ImageUrl);
+
+        const filepath = ImageUrl.split('/storage/v1/object/public/')[1];
+        console.log(filepath);
+        
+
+      const {error: storageError} =  await Supabase
+        .storage
+        .from('imageList')
+        .remove([filepath])
+
+        if(storageError){
+          console.log(storageError);
+        }
+
+        const DeleteQuery = 'DELETE FROM work WHERE id = $1'
+        const values = [id];
+        const Query = await client.query(DeleteQuery, values);
+
+        if(Query.rowCount > 0) {
+          console.log(Query.rowCount,'has gone');
+          res.json({success: true, message:'product has been deleted'})
+        }else{
+          console.log('error occured');
+        }
+        
+      }else{
+        console.log('hmmmm');
+      }
+    } catch (error) {
+      console.error('sth went wrong', error);
+    }
+  })
   
 
 app.listen(port, () => {
