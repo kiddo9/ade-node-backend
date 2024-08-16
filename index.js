@@ -25,6 +25,7 @@ app.options("", cors(ConfigCores))
 app.get('/', (req, res) => {
    return res.send('very good')
 })
+
 app.get('/AllProducts', async(req, res) => {
   try {
      const ProductList = await client.query('SELECT * FROM products_abe');
@@ -45,6 +46,48 @@ app.get('/Allworks', async(req, res) => {
   }else{
       console.log('wahala done dey ooo');
       res.json({fetched: false, message: 'no data data'})
+  }
+})
+
+app.get('/api/v1/work/edit/:id', async(req, res) => {
+  const {id} = req.params;
+
+  try {
+    const Getdetails = 'SELECT * FROM work where id = $1'
+    const detailsId = [id]
+    const Query = await client.query(Getdetails, detailsId)
+
+    if(Query.rowCount > 0) {
+      res.json({fetched:true, result: Query.rows[0]})
+    }else{
+      console.log('sth went wrong');
+      res.json({fetched: false, message: 'unable to get product details'})
+    }
+  } catch (error) {
+    console.log(error);
+    res.json('status: 500, Falied to proccess request . Internal sever error')
+  }
+})
+
+app.get('/api/v1/product/edit/:id', async(req, res) => {
+  const {id} = req.params;
+
+  try {
+    const Getdetails = 'SELECT * FROM products_abe where id = $1'
+    const detailsId = [id]
+    const Query = await client.query(Getdetails, detailsId)
+
+    if(Query.rowCount > 0) {
+      console.log(Query.rows[0]);
+      
+      res.json({fetched:true, result: Query.rows[0]})
+    }else{
+      console.log('sth went wrong');
+      res.json({fetched: false, message: 'unable to get product details'})
+    }
+  } catch (error) {
+    console.log(error);
+    res.json('status: 500, Falied to proccess request . Internal sever error')
   }
 })
 
@@ -199,6 +242,62 @@ app.post('/productDetails', Upload.single('productImage'), async (req, res) => {
     } catch (error) {
       console.error('sth went wrong', error);
     }
+  })
+
+  app.put('/api/v1/update', async(req, res) => {
+    const {workname, workstatus, workdetails} = req.body
+
+    try {
+      const Id = req.body.id
+
+      const SqlSyntax = 'SELECT * FROM work WHERE id = $1'
+      const values = [Id]
+      const Sqlquery = await client.query(SqlSyntax, values)
+
+      if(Sqlquery.rowCount > 0) {
+        const UpdateRow = 'UPDATE work SET workname = $2, workstatus = $3, workdetails = $4 WHERE id = $1';
+        const values = [Id, workname, workstatus, workdetails];
+       await client.query(UpdateRow, values)
+        res.json({Updated: true, message: 'work updated successfully', u})
+        
+      }else{
+        console.log('error');
+        res.json({message: 'unable to update work'})
+      }
+      
+    } catch (error) {
+      console.log(error);
+      res.json({message: "Internal server error"})
+    }
+    
+  })
+
+  app.put('/api/v1/updateProduct', async(req, res) => {
+    const {productname, productstatus, productprice, productdescription, producturl} = req.body
+
+    try {
+      const Id = req.body.id
+
+      const SqlSyntax = 'SELECT * FROM products_abe WHERE id = $1'
+      const values = [Id]
+      const Sqlquery = await client.query(SqlSyntax, values)
+
+      if(Sqlquery.rowCount > 0) {
+        const UpdateRow = 'UPDATE products_abe SET productname = $2, productstatus = $3,  productprice = $4, productdescription = $5, producturl = $6  WHERE id = $1';
+        const values = [Id, productname, productstatus, productprice, productdescription, producturl];
+         await client.query(UpdateRow, values)
+        res.json({Updated: true, message: 'product updated successfully'})
+        
+      }else{
+        console.log('error');
+        res.json({message: 'unable to update product'})
+      }
+      
+    } catch (error) {
+      console.log(error);
+      res.json({message: "Internal server error"})
+    }
+    
   })
   
 
