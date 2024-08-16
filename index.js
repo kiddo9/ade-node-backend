@@ -258,7 +258,7 @@ app.post('/productDetails', Upload.single('productImage'), async (req, res) => {
         const UpdateRow = 'UPDATE work SET workname = $2, workstatus = $3, workdetails = $4 WHERE id = $1';
         const values = [Id, workname, workstatus, workdetails];
        await client.query(UpdateRow, values)
-        res.json({Updated: true, message: 'work updated successfully', u})
+        res.json({Updated: true, message: 'work updated successfully'})
         
       }else{
         console.log('error');
