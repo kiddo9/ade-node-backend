@@ -1,25 +1,25 @@
 const {DataTypes} = require('sequelize');
-//const Connection = require('../config/db_connection')
+const Connection = require('../config/db_connection')
 
 
 const Products = Connection.define('Product', {
-    productImage: {
+    productimage: {
         type: DataTypes.STRING,
     },
     productname:{
         type: DataTypes.CHAR
     },
-    productPrice:{
+    productprice:{
         type: DataTypes.CHAR
     },
-    productStatus: {
+    productstatus: {
         type: DataTypes.CHAR
     },
-    productDescription: {
+    productdescription: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    productUrl: {
+    producturl: {
         type: DataTypes.STRING,
         allowNull: false,
     },
